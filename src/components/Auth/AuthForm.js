@@ -40,7 +40,7 @@ const AuthForm = () => {
       body: JSON.stringify({
         email: enteredEmail,
         password: enteredPassword,
-        returnedSecureToken: true,
+        returnSecureToken: true,
       }),
       headers: { 'Content-Type': 'application/json' },
     })
@@ -65,7 +65,14 @@ const AuthForm = () => {
       })
       .then((data) => {
         console.log('login ok', data);
-        authCtx.login(data.idToken);
+
+        //zistime cas expiracie podla expiresIn, co je cas v sekundach...preto x1000!!
+        console.log(data.expiresIn);
+        const expirationTime = new Date(
+          new Date().getTime() + +data.expiresIn * 1000
+        );
+        console.log(expirationTime);
+        authCtx.login(data.idToken, expirationTime.toISOString());
         history.replace('/');
       })
       .catch((err) => {
